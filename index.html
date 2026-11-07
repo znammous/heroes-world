@@ -5,7 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0b1d4a">
 <title>عالم الأبطال</title>
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%AD%90%3C/text%3E%3C/svg%3E">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/icon-apple.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="عالم الأبطال">
 <style>
 @font-face {
   font-family: "Baloo Bhaijaan 2";
@@ -188,6 +192,10 @@ h1 {
 .flame { animation: flame .9s ease-in-out infinite alternate; transform-box: fill-box; transform-origin: bottom center; }
 @keyframes flame { from { transform: scaleY(.85) scaleX(1.05); } to { transform: scaleY(1.12) scaleX(.92); } }
 
+.install { display: block; margin: 14px auto 0; padding: 8px 20px; border: 2px solid rgba(255,255,255,.55); border-radius: 99px; background: rgba(255,255,255,.12); color: #fff; font: inherit; font-size: 1.05rem; font-weight: 700; cursor: pointer; }
+.install:hover { background: rgba(255,255,255,.22); }
+.install[hidden], .install-tip[hidden] { display: none; }
+.install-tip { margin: 10px auto 0; max-width: 420px; padding: 8px 14px; border-radius: 14px; background: rgba(255,255,255,.14); font-size: 1rem; }
 footer { text-align: center; margin-top: 34px; font-size: 1rem; opacity: .8; }
 
 /* شرارات عند اللمس */
@@ -233,6 +241,8 @@ footer { text-align: center; margin-top: 34px; font-size: 1rem; opacity: .8; }
     <div class="hello">السلام عليكم يا بطل 👋</div>
     <h1>عالم الأبطال</h1>
     <p class="sub">إلى أين تريد أن تذهب اليوم؟ ✨</p>
+    <button class="install" id="installBtn" hidden>📲 ثبّت عالم الأبطال على جهازك</button>
+    <p class="install-tip" id="installTip" hidden></p>
   </header>
 
   <nav class="grid" aria-label="الألعاب">
@@ -500,6 +510,24 @@ footer { text-align: center; margin-top: 34px; font-size: 1rem; opacity: .8; }
       setTimeout(() => { location.href = card.href; }, 450);
     });
   });
+})();
+
+// تثبيت عالم الأبطال كتطبيق على الشاشة الرئيسية: الزر يظهر في المتصفح فقط
+(function () {
+  const btn = document.getElementById('installBtn'), tip = document.getElementById('installTip');
+  const standalone = () => matchMedia('(display-mode: standalone), (display-mode: fullscreen)').matches || navigator.standalone === true;
+  let installPrompt = null;
+  btn.hidden = standalone();
+  addEventListener('beforeinstallprompt', e => { e.preventDefault(); installPrompt = e; });
+  addEventListener('appinstalled', () => { installPrompt = null; btn.hidden = true; tip.hidden = false; tip.textContent = '✅ ثُبّت التطبيق، تجده في الشاشة الرئيسية'; });
+  btn.addEventListener('click', () => {
+    if (installPrompt) { const e = installPrompt; installPrompt = null; e.prompt(); return; }
+    // متصفح لا يدعم نافذة التثبيت (مثل Safari): نشرح الطريقة يدوياً
+    const ios = /iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.maxTouchPoints > 1 && /Mac/.test(navigator.userAgent));
+    tip.textContent = ios ? 'من زر المشاركة ⬆️ اختر «إضافة إلى الشاشة الرئيسية»' : 'من قائمة المتصفح ⋮ اختر «تثبيت التطبيق» أو «إضافة إلى الشاشة الرئيسية»';
+    tip.hidden = false;
+  });
+  if ('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(() => {});
 })();
 </script>
 </body>
