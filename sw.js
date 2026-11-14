@@ -1,6 +1,6 @@
 // يحفظ صفحة عالم الأبطال على الجهاز لتفتح بسرعة وبدون إنترنت
 // غيّر رقم الإصدار عند تعديل أي ملف حتى يحدَّث الكاش
-const CACHE = 'heroes-world-v1';
+const CACHE = 'heroes-world-v2';
 const FILES = [
   './',
   'index.html',
